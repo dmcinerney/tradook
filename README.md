@@ -25,6 +25,6 @@ To activate virtual environment
     
 To install requirenments
 
-    pip install -r dev-requirements.txt
+    bash install.sh
 
 ## Android Application
