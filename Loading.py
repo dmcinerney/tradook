@@ -25,7 +25,7 @@ class image_loading(Dataset): # load the images without applying any random tran
 
         self.root_dir = root_dir
         self.transform = transformation
-        self.images_names = self.read_each_name(csv_file)
+        self.images_name = self.read_each_name(csv_file)
 
     def read_each_name(self, file_name):
         with open(file_name) as f:
@@ -50,7 +50,7 @@ class image_loading(Dataset): # load the images without applying any random tran
         return image1
 
 
-transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor()])
+transform = transforms.Compose([transforms.Scale((64,64)), transforms.ToTensor()])
 
 dataset = image_loading(csv_file='train.txt',
                                     root_dir='LetterImages/',  transformation = transform)
