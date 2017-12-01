@@ -2,8 +2,9 @@ import torch
 import torch.nn.functional as F
 
 class Net(nn.Module):
-    def __init__(self, image_size, batch_size):
+    def __init__(self, image_size):
         super().__init__()
+        self.image_size = image_size
 
         self.fc1 = nn.Linear(image_size ** 2, 128)
         self.fc2 = nn.Linear(256, 128)
@@ -15,3 +16,5 @@ class Net(nn.Module):
         x = self.fc2(x)
         x = F.relu(x)
         x = self.fc3(x)
+
+        return F.softmax(x)
