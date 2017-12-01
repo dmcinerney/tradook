@@ -25,7 +25,7 @@ class image_loading(Dataset): # load the images without applying any random tran
 
         self.root_dir = root_dir
         self.transform = transformation
-        self.images_names = self.read_each_name(csv_file)
+        self.images_name = self.read_each_name(csv_file)
 
     def read_each_name(self, file_name):
         with open(file_name) as f:
@@ -34,17 +34,17 @@ class image_loading(Dataset): # load the images without applying any random tran
             for x in range(0,len(info)):
                 all_names[x/2][x%2] = info[x]
             return all_names
-   
+
     def __len__(self):
         return len(self.images_name)
 
     def __getitem__(self, idx):
         img1_name = os.path.join(self.images_name[idx][0])
         label = os.path.join(self.images_name[idx][0])
-        
+
         image1 = Image.open(img1_name)
         image1 = image1.convert('RGB')
-        print '$$$$', image1.shape
+        print image1.size
         if self.transform is not None:
             image1 = self.transform(image1)
         return image1
@@ -54,12 +54,30 @@ transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor
 
 dataset = image_loading(csv_file='train.txt',
                                     root_dir='LetterImages/',  transformation = transform)
-    
+
 dataloader = DataLoader(dataset, batch_size=12,
                         shuffle=True, num_workers=12)
 
-print(dataloader)
-for i in dataloader:
-    x = 0
-    
+def show_batch(sample_batch):
+    images_batch1 = sample_batch[0]
+    images_batch2 = sample_batch[1]
 
+    grid1 = utils.make_grid(images_batch1).numpy().transpose((1, 2, 0))
+    # print grid1.shape
+    plt.imshow(grid1)
+    plt.axis('off')
+    plt.ioff()
+    plt.show()
+
+    grid2 = utils.make_grid(images_batch2).numpy().transpose((1, 2, 0))
+    plt.imshow(grid2)
+    plt.axis('off')
+    plt.ioff()
+    plt.show()
+
+print(dataloader)
+for sample_batch in dataloader:
+    # x = 0
+    print sample_batch.size()
+    plt.figure()
+    show_batch(sample_batch)
