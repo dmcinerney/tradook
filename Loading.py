@@ -50,7 +50,7 @@ class image_loading(Dataset): # load the images without applying any random tran
         return image1
 
 
-transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor()])
+transform = transforms.Compose([transforms.Scale((64,64)), transforms.ToTensor()])
 
 dataset = image_loading(csv_file='train.txt',
                                     root_dir='LetterImages/',  transformation = transform)
