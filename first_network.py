@@ -148,7 +148,8 @@ def training(cnn_model):
     
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
-        label1 = np.zeros((batch_size, 62))
+        #print("length", len(each[0]))
+        label1 = np.zeros((len(each[0]), 62))
         label_identifier = np.array([int(i) for i in each[1]])
         for x in range(0, len(label_identifier)):
             label1[x][label_identifier[x]] = 1
