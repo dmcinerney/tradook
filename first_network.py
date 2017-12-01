@@ -183,7 +183,7 @@ def testing(cnn_model):
 
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
-        label1 = np.zeros((batch_size, 62))
+        label1 = np.zeros((len(each[0]), 62))
         label_identifier = np.array([int(i) for i in each[1]])
         for x in range(0, len(label_identifier)):
             label1[x][label_identifier[x]] = 1
@@ -192,16 +192,16 @@ def testing(cnn_model):
         label = Variable(label1).cuda()
         output = cnn_model(image1) # get the output of the network
         loss = criterion(output, label) # calculate the loss
-        train_accuracy += accuracy(label, output) # calculate accuracy and add it up
-        train_loss += loss.data[0]
+        test_accuracy += accuracy(label, output) # calculate accuracy and add it up
+        test_loss += loss.data[0]
         iterations += 1.0
-    train_loss = train_loss/iterations
-    train_accuracy = train_accuracy/iterations
+    test_loss = test_loss/iterations
+    test_accuracy = test_accuracy/iterations
         
     return test_loss, test_accuracy
 
 
-epochs = 5
+epochs = 15
 
 all_training_loss = list()
 all_testing_loss = list()
