@@ -40,14 +40,13 @@ class image_loading(Dataset): # load the images without applying any random tran
 
     def __getitem__(self, idx):
         img1_name = os.path.join(self.images_name[idx][0])
-        label = os.path.join(self.images_name[idx][0])
+        label = self.images_name[idx][1]
 
         image1 = Image.open(img1_name)
         image1 = image1.convert('RGB')
-        print image1.size
         if self.transform is not None:
             image1 = self.transform(image1)
-        return image1
+        return image1, label
 
 
 transform = transforms.Compose([transforms.Scale((64,64)), transforms.ToTensor()])
