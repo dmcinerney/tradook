@@ -1,4 +1,4 @@
-#1
+#3
 import torch
 import torchvision
 import torchvision.datasets as dset
@@ -18,7 +18,95 @@ from skimage import data
 from skimage.transform import rotate, SimilarityTransform, warp
 import random
 import sys
-import numpy
+
+
+def randomTransform(lfwDataset_transformations, image): # function that performs a random rotation and random translation with probability of 0.7 each
+    prob = random.randrange(0,10,1)
+    check = 0
+    if (prob < 7):
+        angle = random.randrange(-25.0, 25.0, 1.0)
+        image = rotate(image, angle, resize = True)
+        check +=1
+    prob = random.randrange(0,10,1)
+    if (prob < 7):
+        factor1 = random.randrange(7,11,1)
+        sign1 = random.randrange(0,2,1)
+        if (sign1 == 0):
+            factor1 = factor1 * -1
+        factor2 = random.randrange(7,11,1)
+        sign2 = random.randrange(0,2,1)
+        if (sign2 == 0):
+            factor2 = factor2 * -1
+        transform = SimilarityTransform(translation=(factor1, factor2))
+        image = warp(image, transform)
+        check += 1
+
+    if (check > 0):           
+        max_value = np.amax(image)
+        print("image", image)
+        (vertical,horizontal,colors) = np.shape(image) ##error
+        print("dimensions", vertical, horizontal, colors)
+        new_image = np.zeros((vertical,horizontal, colors), dtype = "float32")
+        if (max_value == 0.0):
+            print("weird")
+        else:
+            image = image * 255/max_value
+
+    return image
+
+
+class image_transformation_loading(Dataset): # load the images without applying any random transformations, just scaling them to 128x128 and converting them to tensors (used for testing)
+
+    def __init__(self, csv_file, root_dir, transformation):
+
+        self.root_dir = root_dir
+        self.transform = transformation[0]
+        self.images_name = self.read_each_name(csv_file)
+        self.transformation1 = transformation[1]
+        self.scale1 = transformation[2]
+        self.scale2 = transformation[3]
+
+    def read_each_name(self, file_name):
+        with open(file_name) as f:
+            info = open(file_name).read().split()
+            all_names = [[None for _ in range(2)] for _ in range(len(info)/2)]
+            for x in range(0,len(info)):
+                all_names[x/2][x%2] = info[x]
+            return all_names
+   
+    def __len__(self):
+        return len(self.images_name)
+
+    def __getitem__(self, idx):
+        img1_name = os.path.join(self.images_name[idx][0])
+        label = self.images_name[idx][1]
+        
+        image1 = Image.open(img1_name)
+
+        prob = random.randrange(0,10,1)
+        if (prob < 7): # perform random scaling
+            prob2 = random.randrange(0,2,1)
+            if (prob2 == 0):
+                image1 = self.scale1(image1)
+            else:
+                image1 = self.scale2(image1)
+                
+        prob = random.randrange(0,10,1)
+        if (prob < 7): # perform random mirror flipping
+            image1 = self.transformation1(image1)
+
+        image1 = np.asarray(image1)
+        image1 = randomTransform(self, image1) #perform random rotation and translation
+        image1 = np.uint8(image1)
+        image1 = PIL.Image.fromarray(image1)        
+        
+        image1 = image1.convert('RGB')
+        if self.transform is not None:
+            image1 = self.transform(image1)
+            
+        return image1, label
+
+
 
 class image_loading(Dataset): # load the images without applying any random transformations, just scaling them to 128x128 and converting them to tensors (used for testing)
 
@@ -120,28 +208,30 @@ def accuracy(label, output): # function to calculate accuracy by comparing the l
     (y, x) = np.shape(np_output)
     for i in range(0, y):
         counter += 1.0
-        label_numpy = label.data.cpu().numpy()[i]
-        output_numpy = output.data.cpu().numpy()[i]
+        label_numpy = label.data.cpu().numpy()[i] ### this is a number
+        #print(label_numpy)
+        output_numpy = output.data.cpu().numpy()[i] # this is an array
         letter = np.argmax(output_numpy)
-        if (label_numpy[letter] == 1.0):
+        if (label_numpy == letter): ###
             result += 1
     result = result/counter
     return result
 
-#learning_rate = 1e-6
-learning_rate = 1e-4
-criterion=nn.MultiLabelMarginLoss()
-#criterion = nn.CrossEntropyLoss()
-#criterion = nn.BCELoss()
+
+criterion = nn.CrossEntropyLoss()
 cnn_model = cnn().cuda()
-optimizer = torch.optim.Adam(cnn_model.parameters(), lr=learning_rate)
-#optimizer = optim.SGD(cnn_model.parameters(), lr=0.001, momentum=0.9)
+#optimizer = torch.optim.Adam(cnn_model.parameters(), lr=learning_rate)
+optimizer = optim.SGD(cnn_model.parameters(), lr=0.001, momentum=0.9)
 batch_size = 12
 
 def training(cnn_model):
     train_loss = 0
+
+    aug_transform_1 = transforms.Compose([transforms.RandomHorizontalFlip()])
+    scale_transform1 = transforms.Compose([transforms.Scale((128,128)), transforms.Scale((int(128*1.3), int(128*1.3))), transforms.CenterCrop((128,128))])
+    scale_transform2 = transforms.Compose([transforms.Scale((128,128)), transforms.Scale((int(128*0.7), int(128*0.7))), transforms.Pad(int(128 - 0.7*128))])
     
-    dataset = image_loading(csv_file='train.txt', root_dir='LetterImages/',  transformation = transform)
+    dataset = image_transformation_loading(csv_file='train.txt', root_dir='LetterImages/',  transformation =  [transform, aug_transform_1, scale_transform1, scale_transform2])
     
     dataloader = DataLoader(dataset, batch_size=12, shuffle=True, num_workers=12)
 
@@ -151,13 +241,14 @@ def training(cnn_model):
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
         #print("length", len(each[0]))
-        label1 = np.zeros((len(each[0]), 62))
-        label_identifier = np.array([int(i) for i in each[1]])
-        for x in range(0, len(label_identifier)):
-            label1[x][label_identifier[x]] = 1.0
-        label1 = torch.from_numpy(label1).view(label1.shape[0], -1)
-        label1 = label1.type(torch.LongTensor)
-        label = Variable(label1).cuda()
+        #label1 = np.zeros((len(each[0]), 62))
+        label1 = np.array([int(i) for i in each[1]])
+        label = torch.from_numpy(label1).view(label1.shape[0], -1)
+        label = label.view(len(label1))
+        label = label.type(torch.LongTensor)
+        #print("label", label)
+        label = Variable(label).cuda()
+        #print("label", label)
         #print("image size", image1.size())
         #print("my_label size", label.size())
         output = cnn_model(image1) # get the output of the network
@@ -187,13 +278,12 @@ def testing(cnn_model):
 
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
-        label1 = np.zeros((len(each[0]), 62))
-        label_identifier = np.array([int(i) for i in each[1]])
-        for x in range(0, len(label_identifier)):
-            label1[x][label_identifier[x]] = 1
-        label1 = torch.from_numpy(label1).view(label1.shape[0], -1)
-        label1 = label1.type(torch.LongTensor)
-        label = Variable(label1).cuda()
+        label1 = np.array([int(i) for i in each[1]])
+        label = torch.from_numpy(label1).view(label1.shape[0], -1)
+        label = label.view(len(label1))
+        label = label.type(torch.LongTensor)
+        #print("label", label)
+        label = Variable(label).cuda()
         output = cnn_model(image1) # get the output of the network
         loss = criterion(output, label) # calculate the loss
         test_accuracy += accuracy(label, output) # calculate accuracy and add it up
@@ -205,7 +295,7 @@ def testing(cnn_model):
     return test_loss, test_accuracy
 
 
-epochs = 40
+epochs = 20
 
 all_training_loss = list()
 all_testing_loss = list()
@@ -229,6 +319,7 @@ print("training loss ", all_training_loss)
 print("testing loss", all_testing_loss)
 print("training accuracy", all_training_accuracy)
 print("testing accuracy", all_testing_accuracy)
+
 
 
 

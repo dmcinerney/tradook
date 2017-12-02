@@ -1,4 +1,4 @@
-#1
+#4
 import torch
 import torchvision
 import torchvision.datasets as dset
@@ -118,24 +118,26 @@ def accuracy(label, output): # function to calculate accuracy by comparing the l
     counter = 0
     np_output = output.data.cpu().numpy()
     (y, x) = np.shape(np_output)
+    print("y", y)
     for i in range(0, y):
         counter += 1.0
-        label_numpy = label.data.cpu().numpy()[i]
-        output_numpy = output.data.cpu().numpy()[i]
+        label_numpy = label.data.cpu().numpy()[i] ### this is a number
+        #print(label_numpy)
+        output_numpy = output.data.cpu().numpy()[i] # this is an array
+        print("output", output_numpy)
+        print("label", label_numpy)
         letter = np.argmax(output_numpy)
-        if (label_numpy[letter] == 1.0):
+        if (label_numpy == letter): ###
             result += 1
+    print("counter", counter)
     result = result/counter
     return result
 
-#learning_rate = 1e-6
-learning_rate = 1e-4
-criterion=nn.MultiLabelMarginLoss()
-#criterion = nn.CrossEntropyLoss()
-#criterion = nn.BCELoss()
+
+criterion = nn.CrossEntropyLoss()
 cnn_model = cnn().cuda()
-optimizer = torch.optim.Adam(cnn_model.parameters(), lr=learning_rate)
-#optimizer = optim.SGD(cnn_model.parameters(), lr=0.001, momentum=0.9)
+#optimizer = torch.optim.Adam(cnn_model.parameters(), lr=learning_rate)
+optimizer = optim.SGD(cnn_model.parameters(), lr=0.001, momentum=0.9)
 batch_size = 12
 
 def training(cnn_model):
@@ -151,13 +153,14 @@ def training(cnn_model):
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
         #print("length", len(each[0]))
-        label1 = np.zeros((len(each[0]), 62))
-        label_identifier = np.array([int(i) for i in each[1]])
-        for x in range(0, len(label_identifier)):
-            label1[x][label_identifier[x]] = 1.0
-        label1 = torch.from_numpy(label1).view(label1.shape[0], -1)
-        label1 = label1.type(torch.LongTensor)
-        label = Variable(label1).cuda()
+        #label1 = np.zeros((len(each[0]), 62))
+        label1 = np.array([int(i) for i in each[1]])
+        label = torch.from_numpy(label1).view(label1.shape[0], -1)
+        label = label.view(len(label1))
+        label = label.type(torch.LongTensor)
+        #print("label", label)
+        label = Variable(label).cuda()
+        #print("label", label)
         #print("image size", image1.size())
         #print("my_label size", label.size())
         output = cnn_model(image1) # get the output of the network
@@ -187,13 +190,12 @@ def testing(cnn_model):
 
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
-        label1 = np.zeros((len(each[0]), 62))
-        label_identifier = np.array([int(i) for i in each[1]])
-        for x in range(0, len(label_identifier)):
-            label1[x][label_identifier[x]] = 1
-        label1 = torch.from_numpy(label1).view(label1.shape[0], -1)
-        label1 = label1.type(torch.LongTensor)
-        label = Variable(label1).cuda()
+        label1 = np.array([int(i) for i in each[1]])
+        label = torch.from_numpy(label1).view(label1.shape[0], -1)
+        label = label.view(len(label1))
+        label = label.type(torch.LongTensor)
+        #print("label", label)
+        label = Variable(label).cuda()
         output = cnn_model(image1) # get the output of the network
         loss = criterion(output, label) # calculate the loss
         test_accuracy += accuracy(label, output) # calculate accuracy and add it up
@@ -201,6 +203,7 @@ def testing(cnn_model):
         iterations += 1.0
     test_loss = test_loss/iterations
     test_accuracy = test_accuracy/iterations
+    
         
     return test_loss, test_accuracy
 
@@ -229,6 +232,7 @@ print("training loss ", all_training_loss)
 print("testing loss", all_testing_loss)
 print("training accuracy", all_training_accuracy)
 print("testing accuracy", all_testing_accuracy)
+
 
 
 

@@ -1,4 +1,4 @@
-#1
+#5 incoorporate saving weights and loading them
 import torch
 import torchvision
 import torchvision.datasets as dset
@@ -19,6 +19,10 @@ from skimage.transform import rotate, SimilarityTransform, warp
 import random
 import sys
 import numpy
+
+
+epochs = 40
+
 
 class image_loading(Dataset): # load the images without applying any random transformations, just scaling them to 128x128 and converting them to tensors (used for testing)
 
@@ -120,22 +124,22 @@ def accuracy(label, output): # function to calculate accuracy by comparing the l
     (y, x) = np.shape(np_output)
     for i in range(0, y):
         counter += 1.0
-        label_numpy = label.data.cpu().numpy()[i]
-        output_numpy = output.data.cpu().numpy()[i]
+        label_numpy = label.data.cpu().numpy()[i] ### this is a number
+        #print(label_numpy)
+        output_numpy = output.data.cpu().numpy()[i] # this is an array
         letter = np.argmax(output_numpy)
-        if (label_numpy[letter] == 1.0):
+        if (label_numpy == letter): ###
             result += 1
     result = result/counter
     return result
 
-#learning_rate = 1e-6
-learning_rate = 1e-4
-criterion=nn.MultiLabelMarginLoss()
-#criterion = nn.CrossEntropyLoss()
-#criterion = nn.BCELoss()
+
+criterion = nn.CrossEntropyLoss()
 cnn_model = cnn().cuda()
-optimizer = torch.optim.Adam(cnn_model.parameters(), lr=learning_rate)
-#optimizer = optim.SGD(cnn_model.parameters(), lr=0.001, momentum=0.9)
+#optimizer = torch.optim.Adam(cnn_model.parameters(), lr=learning_rate) # try using adam optimizer too?
+#optimizer = optim.SGD(cnn_model.parameters(), lr=0.001, momentum=0.9) # the first test was with this
+optimizer = optim.SGD(cnn_model.parameters(), lr=1e-2, momentum=0.9)
+
 batch_size = 12
 
 def training(cnn_model):
@@ -151,13 +155,13 @@ def training(cnn_model):
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
         #print("length", len(each[0]))
-        label1 = np.zeros((len(each[0]), 62))
-        label_identifier = np.array([int(i) for i in each[1]])
-        for x in range(0, len(label_identifier)):
-            label1[x][label_identifier[x]] = 1.0
-        label1 = torch.from_numpy(label1).view(label1.shape[0], -1)
-        label1 = label1.type(torch.LongTensor)
-        label = Variable(label1).cuda()
+        #label1 = np.zeros((len(each[0]), 62))
+        label1 = np.array([int(i) for i in each[1]])
+        label = torch.from_numpy(label1).view(label1.shape[0], -1)
+        label = label.view(len(label1))
+        label = label.type(torch.LongTensor)
+        label = Variable(label).cuda()
+        #print("label", label)
         #print("image size", image1.size())
         #print("my_label size", label.size())
         output = cnn_model(image1) # get the output of the network
@@ -165,7 +169,6 @@ def training(cnn_model):
         loss = criterion(output, label) # calculate the loss
         loss.backward()
         optimizer.step()
-        #output = torch.round(output) # round to 0 and 1 in order to compare the output to the labels
         train_accuracy += accuracy(label, output) # calculate accuracy and add it up
         train_loss += loss.data[0]
         iterations += 1.0
@@ -187,13 +190,11 @@ def testing(cnn_model):
 
     for each in dataloader: # for each pair of images loaded
         image1 = Variable(each[0]).cuda()
-        label1 = np.zeros((len(each[0]), 62))
-        label_identifier = np.array([int(i) for i in each[1]])
-        for x in range(0, len(label_identifier)):
-            label1[x][label_identifier[x]] = 1
-        label1 = torch.from_numpy(label1).view(label1.shape[0], -1)
-        label1 = label1.type(torch.LongTensor)
-        label = Variable(label1).cuda()
+        label1 = np.array([int(i) for i in each[1]])
+        label = torch.from_numpy(label1).view(label1.shape[0], -1)
+        label = label.view(len(label1))
+        label = label.type(torch.LongTensor)
+        label = Variable(label).cuda()
         output = cnn_model(image1) # get the output of the network
         loss = criterion(output, label) # calculate the loss
         test_accuracy += accuracy(label, output) # calculate accuracy and add it up
@@ -205,30 +206,66 @@ def testing(cnn_model):
     return test_loss, test_accuracy
 
 
-epochs = 40
 
-all_training_loss = list()
-all_testing_loss = list()
-all_training_accuracy = list()
-all_testing_accuracy = list()
+def main():
 
-for epoch in range(epochs):
-    print("epoch", epoch)
-    train_loss, train_accuracy = training(cnn_model)
-    print("train loss", train_loss)
-    print("train accuracy", train_accuracy)
-    all_training_loss.append(train_loss)
-    all_training_accuracy.append(train_accuracy)
-    test_loss, test_accuracy = testing(cnn_model)
-    print("test loss", test_loss)
-    print("test accuracy", test_accuracy)
-    all_testing_loss.append(test_loss)
-    all_testing_accuracy.append(test_accuracy)
+    if len(sys.argv) != 3: # if the person didn't input an argument
+        print("Usage: --load/--save WEIGHS_FILE")
+        return
+    
+    filename = sys.argv[2] # the filename to save or load the weights
 
-print("training loss ", all_training_loss)
-print("testing loss", all_testing_loss)
-print("training accuracy", all_training_accuracy)
-print("testing accuracy", all_testing_accuracy)
+    if sys.argv[1] == "--load":
+        print("loading...")
+        cnn_model.load_state_dict(torch.load(filename))
+        test_loss, test_accuracy = testing(cnn_model)
+        train_loss, train_accuracy = training(cnn_model)
+        print("train loss", round(train_loss,2))
+        print("train accuracy", round(train_accuracy,2))
+        print("test loss", round(test_loss,2))
+        print("test accuracy", round(test_accuracy,2))
+        
+    elif sys.argv[1] == "--save":
+        print("Training... the weights will be saved at the end.")
+        all_training_loss = list()
+        all_testing_loss = list()
+        all_training_accuracy = list()
+        all_testing_accuracy = list()
 
+        for epoch in range(epochs):
+            print("epoch", epoch)
+            train_loss, train_accuracy = training(cnn_model)
+            print("train loss", train_loss)
+            print("train accuracy", train_accuracy)
+            all_training_loss.append(train_loss)
+            all_training_accuracy.append(train_accuracy)
+            test_loss, test_accuracy = testing(cnn_model)
+            print("test loss", test_loss)
+            print("test accuracy", test_accuracy)
+            all_testing_loss.append(test_loss)
+            all_testing_accuracy.append(test_accuracy)
 
+        print("training loss ", all_training_loss)
+        print("testing loss", all_testing_loss)
+        print("training accuracy", all_training_accuracy)
+        print("testing accuracy", all_testing_accuracy)
 
+        torch.save(cnn_model.state_dict(), filename)
+
+        plt.switch_backend('agg')
+        plt.plot(all_training_loss, label = "Loss")
+        plt.plot(all_testing_loss, label = "Loss")
+        plt.savefig('p1a_loss', bbox_inches = 'tight')
+
+        plt.plot(all_training_accuracy, label = "accuracy")
+        plt.plot(all_testing_accuracy, label = "accuracy")
+        plt.savefig('p1a_accuracy', bbox_inches = 'tight')
+                
+    else: # if the input arguments don't match any of the options
+        print("Usage: --load/--save WEIGHS_FILE")
+        return
+    
+    return
+
+if __name__ == '__main__':
+    main()
