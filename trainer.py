@@ -12,6 +12,10 @@ def get_test_accuracy(net):
     accuracy = 0
     iter_num = 1
     for images, labels in iter(dataloader):
+        labels = np.array(map(int, labels))
+        labels = torch.from_numpy(labels)
+        labels = labels.type(torch.LongTensor)
+
         if torch.cuda.is_available():
             inputs = Variable(images, volatile=True).cuda()
         else:
@@ -48,34 +52,26 @@ def train():
     testing_accuracy_list = list()
     steps = 1
     running_loss = 0
-    print_every = 500
+    print_every = 1
     for epoch in range(5):
         print epoch
         for images, labels in iter(dataloader):
 
             labels = np.array(map(int, labels))
-            # print type(labels)
             labels = torch.from_numpy(labels)
-            # .view(labels.shape[0], -1)
-            labels = labels.type(torch.FloatTensor)
-            # print labels.size()
-            # image = images.resize(images.size()[0], net.image_size**2)
-            # images = images.view(images.numel())
+            labels = labels.type(torch.LongTensor)
+
             if torch.cuda.is_available():
                 inputs = Variable(images).cuda()
                 target = Variable(labels).cuda()
             else:
                 inputs = Variable(images)
                 target = Variable(labels)
+
             target = target.type(torch.LongTensor)
             optimizer.zero_grad()
-            # print inputs.size()
             output = net.forward(inputs)
-            # print output.size()
-            # print target.size()
-            # print output.size()
-            # print output
-            # print type(output)
+
             loss = criterion(output, target)
             loss.backward()
             optimizer.step()
