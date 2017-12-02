@@ -1,4 +1,5 @@
 env
+*.pyc
 LetterImages*
 .DS_Store
 *data/*
