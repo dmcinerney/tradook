@@ -5,6 +5,8 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
 import torch.optim as optim
 import matplotlib.pyplot as plt
+#import matplotlib
+#matplotlib.use('Agg')
 import numpy as np
 from torch.autograd import Variable
 import os

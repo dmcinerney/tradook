@@ -1,6 +1,9 @@
+import matplotlib
+matplotlib.use("Agg")
 from Loading import *
 from torch import optim
 from jack_net import *
+
 
 image_size = 50
 
@@ -53,7 +56,7 @@ def train():
     steps = 1
     running_loss = 0
     print_every = 500
-    for epoch in range(20):
+    for epoch in range(40):
         print epoch
         for images, labels in iter(dataloader):
 
@@ -86,9 +89,11 @@ def train():
                 print 'training loss ', float(running_loss) / float(steps)
                 testing_accuracy_list.append(get_test_accuracy(net))
             steps+=1
+	
+    torch.save(net.state_dict(), 'weights_jack_net')
 
-    x_training = np.linspace(0, steps, len(training_loss_list))
-    plt.plot(x_training, training_loss_list)
+    x_training = np.linspace(0, steps, len(train_loss_list))
+    plt.plot(x_training, train_loss_list)
     plt.title('training loss')
     plt.savefig('jack_training_loss.png')
     plt.clf()
