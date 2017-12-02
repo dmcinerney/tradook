@@ -52,8 +52,8 @@ def train():
     testing_accuracy_list = list()
     steps = 1
     running_loss = 0
-    print_every = 1
-    for epoch in range(5):
+    print_every = 500
+    for epoch in range(20):
         print epoch
         for images, labels in iter(dataloader):
 
@@ -62,13 +62,16 @@ def train():
             labels = labels.type(torch.LongTensor)
 
             if torch.cuda.is_available():
-                inputs = Variable(images).cuda()
-                target = Variable(labels).cuda()
+                #print 'in cuda'
+		inputs = Variable(images).cuda()
+                labels = labels.type(torch.LongTensor)
+		target = Variable(labels).cuda()
             else:
                 inputs = Variable(images)
+		labels = labels.type(torch.LongTensor)
                 target = Variable(labels)
 
-            target = target.type(torch.LongTensor)
+           # target = target.type(torch.LongTensor)
             optimizer.zero_grad()
             output = net.forward(inputs)
 
@@ -84,13 +87,13 @@ def train():
                 testing_accuracy_list.append(get_test_accuracy(net))
             steps+=1
 
-    x_training = np.linspace(0, iter_num, len(training_loss_list))
+    x_training = np.linspace(0, steps, len(training_loss_list))
     plt.plot(x_training, training_loss_list)
     plt.title('training loss')
     plt.savefig('jack_training_loss.png')
     plt.clf()
 
-    x_testing = np.linspace(0, iter_num, len(testing_accuracy_list))
+    x_testing = np.linspace(0, steps, len(testing_accuracy_list))
     plt.plot(x_testing, testing_accuracy_list)
     plt.title('testing accuracy')
     plt.savefig('jack_testing_accuracy.png')
