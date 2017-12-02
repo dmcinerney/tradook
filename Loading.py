@@ -40,23 +40,24 @@ class image_loading(Dataset): # load the images without applying any random tran
 
     def __getitem__(self, idx):
         img1_name = os.path.join(self.images_name[idx][0])
-        label = os.path.join(self.images_name[idx][0])
-
+        label = self.images_name[idx][1]
+        # print type(label)
         image1 = Image.open(img1_name)
         image1 = image1.convert('RGB')
-        print image1.size
+        # print type(image1)
+        # print image1.size
         if self.transform is not None:
             image1 = self.transform(image1)
-        return image1
+        return image1, label
 
 
-transform = transforms.Compose([transforms.Scale((64,64)), transforms.ToTensor()])
-
-dataset = image_loading(csv_file='train.txt',
-                                    root_dir='LetterImages/',  transformation = transform)
-
-dataloader = DataLoader(dataset, batch_size=12,
-                        shuffle=True, num_workers=12)
+# transform = transforms.Compose([transforms.Scale((64,64)), transforms.ToTensor()])
+#
+# dataset = image_loading(csv_file='train.txt',
+#                                     root_dir='LetterImages/',  transformation = transform)
+#
+# dataloader = DataLoader(dataset, batch_size=12,
+#                         shuffle=True, num_workers=12)
 
 def show_batch(sample_batch):
     images_batch1 = sample_batch[0]
@@ -74,10 +75,10 @@ def show_batch(sample_batch):
     plt.axis('off')
     plt.ioff()
     plt.show()
-
-print(dataloader)
-for sample_batch in dataloader:
-    # x = 0
-    print sample_batch.size()
-    plt.figure()
-    show_batch(sample_batch)
+#
+# print(dataloader)
+# for sample_batch in dataloader:
+#     # x = 0
+#     # print sample_batch.size()
+#     plt.figure()
+#     show_batch(sample_batch)
