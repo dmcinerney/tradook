@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torch.autograd import Variable
 import os
-import cv2
+#import cv2
 import torch.nn as nn
 import torch.nn.functional as F
 import PIL
@@ -123,7 +123,7 @@ def print_result(output): # function to calculate accuracy by comparing the labe
 
 criterion = nn.CrossEntropyLoss()
 
-if torch.cuda.is_available:
+if torch.cuda.is_available():
     cnn_model = cnn().cuda()
 else:
     print("running without cuda")
@@ -135,7 +135,7 @@ optimizer = optim.SGD(cnn_model.parameters(), lr=1e-2, momentum=0.9)
 filename = 'weights_40_epochs'
 
 
-cnn_model.load_state_dict(torch.load(filename))
+#cnn_model.load_state_dict(torch.load(filename))
 file_name = "images.txt"
 with open(file_name) as f:
     info = open(file_name).read().split()
@@ -150,7 +150,7 @@ dataloader = DataLoader(dataset, batch_size=100,
                 shuffle=False, num_workers=100)
 
 for each in dataloader:
-    if torch.cuda.is_available:
+    if torch.cuda.is_available():
         image1 = Variable(each[0]).cuda()
     else:
         image1 = Variable(each[0])
