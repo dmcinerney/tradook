@@ -23,7 +23,36 @@ import numpy
 
 epochs = 35
 characters = np.array(['o', 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'])
+results = []
 
+class loading_to_label(Dataset): # load the images without applying any random transformations, just scaling them to 128x128 and converting them to tensors (used for testing)
+
+    def __init__(self, csv_file, root_dir, transformation):
+
+        self.root_dir = root_dir
+        self.transform = transformation
+        self.images_name = self.read_each_name(csv_file)
+
+    def read_each_name(self, file_name):
+        with open(file_name) as f:
+            info = open(file_name).read().split()
+            all_names = [[None for _ in range(2)] for _ in range(len(info)/2)]
+            for x in range(0,len(info)):
+                all_names[x/2][x%2] = info[x]
+            return info
+   
+    def __len__(self):
+        return len(self.images_name)
+
+    def __getitem__(self, idx):
+        img1_name = os.path.join(self.images_name[idx])
+        
+        image1 = Image.open(img1_name)
+        image1 = image1.convert('RGB')
+        if self.transform is not None:
+            image1 = self.transform(image1)
+        return image1, image1
+    
 
 class image_loading(Dataset): # load the images without applying any random transformations, just scaling them to 128x128 and converting them to tensors (used for testing)
 
@@ -56,14 +85,14 @@ class image_loading(Dataset): # load the images without applying any random tran
 
 
 transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor()])
-
+'''
 dataset = image_loading(csv_file='train.txt',
                                     root_dir='LetterImages/',  transformation = transform)
     
 dataloader = DataLoader(dataset, batch_size=12,
                         shuffle=True, num_workers=12)
 
-
+'''
 
 class cnn(nn.Module):
 
@@ -138,6 +167,23 @@ def accuracy(label, output): # function to calculate accuracy by comparing the l
             print(truth, prediction)
     result = result/counter
     return result
+
+def print_result(output): # function to calculate accuracy by comparing the labels to the output of the network
+    counter = 0
+    np_output = output.data.cpu().numpy()
+    (y, x) = np.shape(np_output)
+    for i in range(0, y):
+        #print(counter)
+        counter += 1.0
+        output_numpy = output.data.cpu().numpy()[i] # this is an array
+        letter = np.argmax(output_numpy)
+        if (output_numpy[letter] > 0.91):
+            prediction = characters[letter]
+            print(prediction)
+            results.append(prediction)
+        else:
+            print('-')
+            results.append('-')        
 
 
 criterion = nn.CrossEntropyLoss()
@@ -230,6 +276,49 @@ def main():
         print("train accuracy", round(train_accuracy,2))
         print("test loss", round(test_loss,2))
         print("test accuracy", round(test_accuracy,2))
+
+    elif sys.argv[1] == "--test":
+        print("testing input images")
+        cnn_model.load_state_dict(torch.load(filename))
+        file_name = "images.txt"
+        with open(file_name) as f:
+            info = open(file_name).read().split()
+
+
+        transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor()])
+
+        dataset = loading_to_label(csv_file = file_name,
+                                    root_dir='LetterImages/',  transformation = transform)
+    
+        dataloader = DataLoader(dataset, batch_size=100,
+                        shuffle=False, num_workers=100)
+
+        for each in dataloader:
+            #print("once cycle of the data loader")
+            image1 = Variable(each[0]).cuda()
+            output = cnn_model(image1) # get the output of the network
+            print_result(output)
+    
+        '''
+            for x in range(0, len(info)):
+                image1 = Image.open(info[x]) 
+                image1 = image1.convert('RGB')
+                image1 = transform(image1) # now I have an image
+                image = Variable(image1).cuda()
+                image = image.unsqueeze(0) # the image is always different, but right format?? mmm
+                output = cnn_model(image)
+                np_output = output.data.cpu().numpy()[0] # why is output always the same? always same image?
+                print(np_output)
+                letter_index = np.argmax(np_output)
+                #print(letter_index)
+                if (np_output[letter_index] > 0.1):
+                    letter = characters[letter_index]
+                    print(letter)
+                else:
+                    print("-")
+        '''
+        print("results", results) 
+
         
     elif sys.argv[1] == "--save":
         print("Training... the weights will be saved at the end.")
@@ -275,4 +364,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
