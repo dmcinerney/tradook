@@ -4,3 +4,4 @@ scipy
 opencv-python
 matplotlib
 scikit-image
+google-cloud-translate==1.3.0
