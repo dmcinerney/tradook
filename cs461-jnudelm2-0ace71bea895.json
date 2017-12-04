@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "august-edge-184523",
+  "private_key_id": "0ace71bea895b01b31053d4825c498fcac6fb0fc",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDUE5Jusv9dA3oF\n3n13soVuS9wZAWLgRQd27VKrNEZUFZHGgJwikgb6jNWRKC4mApJco9uxGhQNaNxl\n/LOb1dbXEdrjUc75crWmrX74oOHmQIXvXcAqZE6sgla1d83nU3oHXTrQtLoasoej\nEJCeVo3afNrV8AmIWrrlrajwf8OXjllnyru0F5XIiuIuHoZPX/xifyFNbBVrmAf6\nj0rhV9p8vuSmTUZeXOEn9PxkPvtvP3dzV9ZaSwRSQBfdHISiMCYLAif1r/hkr+01\n4hin5Srd+9aWTzWZrV3zGhb5IkOL6mywqvbbZvwfkSH9ffsVwVtYskB/gCM8RgIh\nKMt+l3sTAgMBAAECggEABnuORqKWsLqtYH/zeOG00QrLlw4WSvTnn5u6IuNnSCTp\nC4oDe83X6pFWHYJLatXTfVAOJDgMwRFhnB9Hd23n2JoontM+dU/FPFH7jbd2DRcP\noQhns92hRzlF7XUhW6Vb5EOJMgQ117p5iYmbluN31Mprpad/oX9+5nKfaLHKTxfr\nshXFzVFBq0mIh/UTFjqP+l35eSGOrNuU7DCdO6MfovvLU65PG9n5aXbktzJgRTjO\nx1JvuiR6SXYQuQTKPSYmKuCsxfI251QudgBdRjYQuAKqIrE3Bo8VCMqsbvcliYRb\nDrEEQOSeVwr7lR6dbpvhGG/jUMHHLB6+YY1bti0zdQKBgQDu0khfe/5Htf0UGkkb\nC8wkt4GAfwFFfFwCPudWmTZAlGAJX0+XDvtbt3amwe/hk19s0UOfuBFb0EMXqn1g\nB1z8sz3fSaqnrYq4MnVg2KNkYFJjEXOx52ZRDHluCjHhU/H3viVRE1OVFyRGWl1F\nKYCtvKXVFf4DHTRGvIzxjirEXQKBgQDjVM0ELHZp81JrRahue9zCEVsdEVlrWYj0\nN33onu5i+6ZkPrFe1WH/rXYEmqsTNtAOF6fknw4xgWtZSBausFIN05A927ncunuH\nq2m+XklJGC/KRIwq+cmP87ZRIyFxC/yGFzNsG+v88oGopigdpXF3rjJafLP8LK1A\nUd6wjnxGLwKBgQDJfOhKhtYVslj+qN6czutA3wGHY5+y/CS0UFXlHgZDnesYfS0t\nCRrQWozkTCMScb/Ekxk2m5kpmR/By7lTV2MAYEkHJaOxLB0pIokdWCkh+pIHuyWd\nJtmP77JTQI6syKIQnn/lUyTlWEzmfj7KpyVFby+KA6/2+KCuPU28TnGOkQKBgQCd\nMXU2bpxO9P7HyHoIM8PZufCb7/Q6A8ZswLZilQtYDJTo+mTho4FJL6PM2Tp0ZdGF\n/RuOPeGtn8UgDnYIw0lp4CH8dCRYGebzUDcleMMKNRxOrAmUafbTgH1QK4+jQNuT\nyRU4qzIKTZIUkRhqL41/aUfORC6csDP4puPqiAws5wKBgB0dqOmhe47D02Mjr33O\nW1gGaQExTNoHgilCjBqFTagjXtUQtkXWaQsDwUD7g1j/jYM2spxOPRdgSp1ocgqo\nQpuHin/MoGRjiRneG6kW8zFVGRVIQtDEYeEQ2TrqF9kCcaKshkJyCl6tUdF5KlaK\nZA+jN/JpIT3/l9h/O4c9YOet\n-----END PRIVATE KEY-----\n",
+  "client_email": "tradook-team@august-edge-184523.iam.gserviceaccount.com",
+  "client_id": "101617497712828699892",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/tradook-team%40august-edge-184523.iam.gserviceaccount.com"
+}
