@@ -139,7 +139,7 @@ def sort_boxes(boxes, group_by_line=False):
     new_boxes = []
     for line in grouper(boxes, 10, lambda x:x.getCenter()[1]):
         if group_by_line:
-                new_boxes.append([])
+            new_boxes.append([])
         for box in sorted(line, key=lambda x:x.getCenter()[0]):
             if group_by_line:
                 new_boxes[-1].append(box)
