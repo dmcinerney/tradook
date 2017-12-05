@@ -163,8 +163,6 @@ def accuracy(label, output): # function to calculate accuracy by comparing the l
         
         if (truth == prediction): ###
             result += 1
-        else:
-            print(truth, prediction)
     result = result/counter
     return result
 

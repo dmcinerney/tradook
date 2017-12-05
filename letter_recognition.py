@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torch.autograd import Variable
 import os
-import cv2
+#import cv2
 import torch.nn as nn
 import torch.nn.functional as F
 import PIL
@@ -122,7 +122,13 @@ def print_result(output): # function to calculate accuracy by comparing the labe
 
 
 criterion = nn.CrossEntropyLoss()
-cnn_model = cnn()
+
+if torch.cuda.is_available():
+    cnn_model = cnn().cuda()
+else:
+    print("running without cuda")
+    cnn_model = cnn()
+    
 optimizer = optim.SGD(cnn_model.parameters(), lr=1e-2, momentum=0.9)
 
 
@@ -144,7 +150,10 @@ dataloader = DataLoader(dataset, batch_size=100,
                 shuffle=False, num_workers=100)
 
 for each in dataloader:
-    image1 = Variable(each[0])
+    if torch.cuda.is_available():
+        image1 = Variable(each[0]).cuda()
+    else:
+        image1 = Variable(each[0])
     output = cnn_model(image1) # get the output of the network
     print_result(output)
 
