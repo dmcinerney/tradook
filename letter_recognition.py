@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torch.autograd import Variable
 import os
-#import cv2
+import cv2
 import torch.nn as nn
 import torch.nn.functional as F
 import PIL
@@ -39,19 +39,19 @@ class loading_to_label(Dataset): # load the images without applying any random t
             for x in range(0,len(info)):
                 all_names[x/2][x%2] = info[x]
             return info
-   
+
     def __len__(self):
         return len(self.images_name)
 
     def __getitem__(self, idx):
         img1_name = os.path.join(self.images_name[idx])
-        
+
         image1 = Image.open(img1_name)
         image1 = image1.convert('RGB')
         if self.transform is not None:
             image1 = self.transform(image1)
         return image1, image1
-    
+
 
 transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor()])
 
@@ -69,7 +69,7 @@ class cnn(nn.Module):
         self.linear2 = nn.Linear(1024, 62)
 
         self.maxPool = nn.MaxPool2d(2, stride = (2,2))
-        
+
         self.batch_norm1 = nn.BatchNorm2d(64)
         self.batch_norm2 = nn.BatchNorm2d(128)
         self.batch_norm3 = nn.BatchNorm2d(256)
@@ -79,7 +79,7 @@ class cnn(nn.Module):
     def forward(self, image1):
         image1 = forward_each(self, image1) # each image goes through the same network
         results = F.sigmoid(self.linear2(image1)) # convert the results to values between 0 and 1
-        
+
         return results
 
 def forward_each(cnn, x):
@@ -118,24 +118,24 @@ def print_result(output): # function to calculate accuracy by comparing the labe
             prediction = characters[letter]
             results.append(prediction)
         else:
-            results.append('-')        
+            results.append('-')
 
 
 criterion = nn.CrossEntropyLoss()
 
-if torch.cuda.is_available():
-    cnn_model = cnn().cuda()
-else:
-    print("running without cuda")
-    cnn_model = cnn()
-    
+# if torch.cuda.is_available():
+#     cnn_model = cnn().cuda()
+# else:
+#     print("running without cuda")
+cnn_model = cnn()
+
 optimizer = optim.SGD(cnn_model.parameters(), lr=1e-2, momentum=0.9)
 
 
 filename = 'weights_40_epochs'
 
 
-#cnn_model.load_state_dict(torch.load(filename))
+# cnn_model.load_state_dict(torch.load(filename))
 file_name = "images.txt"
 with open(file_name) as f:
     info = open(file_name).read().split()
@@ -150,14 +150,11 @@ dataloader = DataLoader(dataset, batch_size=100,
                 shuffle=False, num_workers=100)
 
 for each in dataloader:
-    if torch.cuda.is_available():
-        image1 = Variable(each[0]).cuda()
-    else:
-        image1 = Variable(each[0])
+    # if torch.cuda.is_available():
+    #     image1 = Variable(each[0]).cuda()
+    # else:
+    image1 = Variable(each[0])
     output = cnn_model(image1) # get the output of the network
     print_result(output)
 
-print("results", results) 
-
-        
-
+print("results", results)
