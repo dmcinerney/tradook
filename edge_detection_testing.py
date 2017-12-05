@@ -126,3 +126,26 @@ def split_words(lines, vis):
 
     plt.imshow(vis)
     plt.show()
+
+
+def grouper(iterable, threshold, function):
+    iterable = sorted(iterable, key=function)
+    prev = None
+    group = []
+    for item in iterable:
+        if prev is None or function(item) - function(prev) <= threshold:
+            group.append(item)
+        else:
+            yield group
+            group = [item]
+        prev = item
+    if group:
+        yield group
+
+
+def sort_boxes(boxes):
+    new_boxes = []
+    for line in grouper(boxes, 10, lambda x:x.getCenter()[1]):
+        for box in sorted(line, key=lambda x:x.getCenter()[0]):
+            new_boxes.append(box)
+    return new_boxes
