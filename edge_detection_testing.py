@@ -149,3 +149,4 @@ def sort_boxes(boxes):
         for box in sorted(line, key=lambda x:x.getCenter()[0]):
             new_boxes.append(box)
     return new_boxes
+    
