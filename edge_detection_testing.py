@@ -35,6 +35,7 @@ def get_interesting_areas(image):
 
 
 def cleanup_boxes(boxes):
+    boxes = sort_boxes(boxes)
     #remove duplicate boxes
     i = 1
     print len(boxes)
@@ -120,6 +121,20 @@ def split_words(lines, vis):
     plt.show()
 
 
+def remove_non_letters(boxes, results):
+    i = 1
+    boxes_size = len(boxes)
+    while i < boxes_size:
+        if results[i] == '-': #should tailor this value based on the sizes of boxes in the image
+            boxes.pop(i)
+            results.pop(i)
+            boxes_size -= 1
+        else:
+            i += 1
+
+    return boxes, results
+
+
 def grouper(iterable, threshold, function):
     iterable = sorted(iterable, key=function)
     prev = None
@@ -141,4 +156,3 @@ def sort_boxes(boxes):
         for box in sorted(line, key=lambda x:x.getCenter()[0]):
             new_boxes.append(box)
     return new_boxes
-
