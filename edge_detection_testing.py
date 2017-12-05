@@ -17,6 +17,7 @@ image_letters = []
 for i in range(1,7):
     image_letters.append([])
     img = cv2.imread('image' + str(i) + '.png')
+#     print(img)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     vis = img_gray.copy()
     # vis = cv2.Canny(img_gray, 30, 200)
@@ -33,6 +34,9 @@ for i in range(1,7):
         maxX = np.max(region[:, 0])
         highestY = np.min(region[:, 1])
         lowestY = np.max(region[:, 1])
+        
+        if min([minX,maxX,highestY,lowestY]) < 0 or max([minX,maxX]) > img.shape[1] or max([highestY,lowestY]) > img.shape[0]:
+            continue
 
         image_letters[-1].append((None, minX, lowestY, maxX, highestY))
 
@@ -40,16 +44,29 @@ for i in range(1,7):
 
     # hulls = [cv2.convexHull(p.reshape(-1, 1, 2)) for p in regions]
 
-    plt.imshow(vis)
-    plt.show()
+    # plt.imshow(vis)
+    # plt.show()
 
+images_folder = 'images_cropped'
+if not os.path.exists(images_folder):
+    os.mkdir(images_folder)
+image_paths = []
 for i,letters in enumerate(image_letters, 1):
-    img = cv2.imread('image' + str(i) + '.png')
+    image_file = 'image' + str(i) + '.png'
     image_folder = 'image' + str(i)
-    if not os.path.exists(image_folder):
-        os.mkdir(image_folder)
+    img = cv2.imread(image_file)
+    if not os.path.exists(os.path.join(images_folder,image_folder)):
+        os.mkdir(os.path.join(images_folder,image_folder))
     for j,letter in enumerate(letters):
-        cv2.imwrite(os.path.join(image_folder,'image'+str(j)+'.png'), img[letter[1]:letter[3],letter[2]:letter[4]])
+#         plt.imshow(img[letter[1]:letter[3],letter[2]:letter[4]])
+#         plt.show()
+        image_path = os.path.join(images_folder,image_folder,'image'+str(j)+'.png')
+        image_paths.append(image_path)
+        cv2.imwrite(image_path, img[letter[4]:letter[2],letter[1]:letter[3]])
+        
+with open('images.txt', 'w') as f:
+    for path in image_paths:
+        f.write(path+'\n')
     
 with open('image_letter_positions.txt', 'w') as f:
     for letters in image_letters:
