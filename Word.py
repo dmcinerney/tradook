@@ -1,10 +1,13 @@
 class Word:
-    def __init__(self):
+    def __init__(self, boxes):
         self.boxes = []
         self.minx = None
         self.miny = None
         self.maxx = None
         self.maxy = None
+        for box in boxes:
+            self.boxes.append(box)
+        self.update_box()
         
     def append(self, box):
         self.boxes.append(box)
