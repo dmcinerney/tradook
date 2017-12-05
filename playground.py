@@ -140,4 +140,27 @@ def cluster():
     plt.imshow(vis)
     plt.show()
 
-cluster()
+# cluster()
+img = cv2.imread('image4.png')
+img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+img_gray = cv2.GaussianBlur(img_gray, (5,5), 0)
+z, img_thresh = cv2.threshold(img_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+components = cv2.connectedComponentsWithStats(img_thresh, 3)
+
+print len(components[1])
+stats = components[2]
+centroids = components[3]
+
+# for i in rang(len(centroids)):
+for stat in stats:
+    minX = stat[0]
+    maxX = minX + stat[2]
+    minY = stat[1]
+    maxY = minY + stat[3]
+
+    cv2.rectangle(img_gray, (int(minX), int(minY)), (int(maxX), int(maxY)), (255, 255, 0), 1)
+
+
+plt.imshow(img_gray)
+plt.show()

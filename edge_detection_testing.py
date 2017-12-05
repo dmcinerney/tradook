@@ -5,16 +5,9 @@ import numpy as np
 from Boxes import *
 from sklearn.cluster import KMeans
 
-# def auto_canny(img, sigma=0.33):
-#     median = np.median(img)
-#     lower = int(max(0, (1 - sigma)* sigma))
-#     upper = int(min(255, (1 + sigma)* sigma))
-#
-#     return cv2.Canny(img, lower, upper)
 
 def get_interesting_areas(image):
     mser = cv2.MSER_create()
-    # for i in range(1,7):
     img = cv2.imread(image)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_gray = cv2.GaussianBlur(img_gray, (5,5), 0)
@@ -35,10 +28,13 @@ def get_interesting_areas(image):
         lowestY = np.max(region[:, 1])
         box = Box((minX, highestY), (maxX, lowestY))
         boxes.append(box)
-        cv2.circle(vis, (int(box.centerX), int(box.centerY)), 2, (0, 0, 255), -1)
+        # cv2.circle(vis, (int(box.centerX), int(box.centerY)), 2, (0, 0, 255), -1)
         # cv2.rectangle(vis, (maxX, lowestY), (minX, highestY), (255, 0, 0), 2)
+    return boxes
 
-    boxes.sort(compare_boxes)
+
+
+def cleanup_boxes(boxes):
     #remove duplicate boxes
     i = 1
     print len(boxes)
@@ -62,17 +58,13 @@ def find_lines(boxes):
     lowY = boxes[0].lowY
     highY = boxes[0].highY
     for letter in boxes:
-        # cv2.rectangle(vis, (letter.minX, letter.highY), (letter.maxX, letter.lowY), (255, 255, 0), 4)
         new_range = box_is_within_range(letter, highY, lowY)
-        # print new_range
         if len(new_range) != 0:
             lowY, highY = new_range[0], new_range[1]
             line.append(letter)
             centers.append([letter.centerX, letter.centerY])
         else:
             lines.append(line)
-            # cv2.line(vis, (0, lowY), (vis.shape[1], lowY),(0,255, 0), 2)
-            # cv2.line(vis, (0, highY), (vis.shape[1], highY),(0,255, 0), 2)
             line = list()
             line.append(letter)
             centers.append([letter.centerX, letter.centerY])
@@ -124,5 +116,5 @@ def split_words(lines, vis):
                 cv2.rectangle(vis, first_point, second_point, (0, 0, 255), 2)
                 first_point = (line[i + 1].minX, line[i + 1].highY)
 
-    plt.imshow(vis)
-    plt.show()
+    # plt.imshow(vis)
+    # plt.show()

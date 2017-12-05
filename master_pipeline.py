@@ -4,18 +4,22 @@ def main(image_filenamme):
 	# take in an image filename
 
 	# step 1
-	# call jack's function to get possilbe letter regions and pass in image_filename
+	# call jack's function to get possible letter regions and pass in image_filename
 	# ouput: an array of boxes ordered
+	boxes = ed.get_interesting_areas(image_filenamme)
+
 	# step 2
 	# input: array of boxes ordered
 	# clean up boxes using centroid and area
 	# output: an array of boxes ordered
-	boxes = ed.get_interesting_areas(image_filenamme)
+	boxes = ed.sort_boxes(boxes)
+	boxes = ed.cleanup_boxes(boxes)
 
 	# step 3
 	# input: array of boxes ordered
 	# load boxes into dataloader
 	# output: Dataloader object ordered
+	
 
 	# step 4
 	# input: DataLoader object
