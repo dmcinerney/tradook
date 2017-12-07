@@ -82,7 +82,7 @@ def find_lines(boxes):
 
     #cluster per line
 def split_words(lines, img):
-    i = 1
+    img = cv2.imread(img)
     for line in lines:
         # print i
         i+=1
@@ -123,8 +123,6 @@ def split_words(lines, img):
                 cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 first_point = (line[i + 1].minX, line[i + 1].highY)
     return words
-    plt.imshow(img)
-    plt.show()
 
 
 def remove_non_letters(boxes, results):

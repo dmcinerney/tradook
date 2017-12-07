@@ -37,7 +37,7 @@ def main(image_filename):
 	# input: array of boxes ordered
 	# call function to form words from boxes
 	# output: array of words with letters set to None
-
+	words = ed.split_words(lines, image_filename)
 	# step 7
 	# attach letters to words and do any possible letter label correction using spellcheck library
 
