@@ -15,7 +15,7 @@ def get_interesting_areas(image):
 
 
     # regions = mser.detectRegions(vis, None)
-    regions = mser.detectRegions(img_gray, None)
+    regions, _ = mser.detectRegions(img_gray)
     boxes = list()
     # i = 1
     for region in regions:
