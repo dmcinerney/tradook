@@ -128,9 +128,10 @@ def letter_recognition_network(boxes, image_name):
     optimizer = optim.SGD(cnn_model.parameters(), lr=1e-2, momentum=0.9)
 
 
-    filename = 'weights_40_epochs'
+    filename = 'weights_40_epochs.dms'
 
 
+    # cnn_model.load_state_dict(torch.load(filename), map_location=lambda storage, loc: storage)
     cnn_model.load_state_dict(torch.load(filename))
 
     transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor()])

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from Boxes import *
 from sklearn.cluster import KMeans
-
+from Word import Word
 
 def get_interesting_areas(image):
     mser = cv2.MSER_create()
@@ -16,7 +16,7 @@ def get_interesting_areas(image):
 
 
     # regions = mser.detectRegions(vis, None)
-    regions = mser.detectRegions(img_gray, None)
+    regions, _ = mser.detectRegions(img_gray)
     boxes = list()
     # i = 1
     for region in regions:
@@ -84,8 +84,6 @@ def find_lines(boxes):
 def split_words(lines, img):
     img = cv2.imread(img)
     for line in lines:
-        # print i
-        i+=1
         centers = [[box.centerX, box.centerY] for box in line]
         num_boxes = len(line)
         errors = list()
@@ -120,6 +118,8 @@ def split_words(lines, img):
                 words.append(Word(letters_in_word))
                 cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 first_point = (line[i + 1].minX, line[i + 1].highY)
+    plt.imshow(img)
+    plt.show()
     return words
 
 
