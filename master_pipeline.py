@@ -41,5 +41,5 @@ def main(image_filenamme):
 
 
 if __name__ == '__main__':
-	image_filenamme = ""
+	image_filenamme = "image1.png"
 	main(image_filenamme)

@@ -5,7 +5,6 @@ import numpy as np
 from Boxes import *
 from sklearn.cluster import KMeans
 
-
 def get_interesting_areas(image):
     mser = cv2.MSER_create()
     img = cv2.imread(image)
