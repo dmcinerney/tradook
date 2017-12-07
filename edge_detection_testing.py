@@ -84,7 +84,8 @@ def find_lines(boxes):
 def split_words(lines, img):
     img = cv2.imread(img)
     for line in lines:
-        centers = [[box.centerX, box.centerY] for box in line]
+        # centers = [[box.centerX, box.centerY] for box in line]
+        centers = [[box.centerX] for box in line]
         num_boxes = len(line)
         errors = list()
         for i in np.arange(1, num_boxes):
@@ -97,7 +98,8 @@ def split_words(lines, img):
             num_clusters = 1
         else:
             derivatives = np.ediff1d(errors)
-            num_clusters = np.argmin(derivatives) + 2
+            num_clusters = np.argmin(derivatives) + 1
+        print num_clusters
 
         kmeans = KMeans(n_clusters=num_clusters, random_state=0).fit(centers)
 
@@ -124,7 +126,7 @@ def split_words(lines, img):
 
 
 def remove_non_letters(boxes, results):
-    i = 1
+    i = 0
     boxes_size = len(boxes)
     while i < boxes_size:
         if results[i] == '-': #should tailor this value based on the sizes of boxes in the image
@@ -153,11 +155,12 @@ def grouper(iterable, threshold, function):
 
 
 def sort_boxes(boxes, group_by_line=False):
+    # print(boxes)
     new_boxes = []
-    for line in grouper(boxes, 10, lambda x:x.getCenter()[1]):
+    for line in grouper(boxes, 10, lambda box:box.getCenter()[1]):
         if group_by_line:
             new_boxes.append([])
-        for box in sorted(line, key=lambda x:x.getCenter()[0]):
+        for box in sorted(line, key=lambda box:box.getCenter()[0]):
             if group_by_line:
                 new_boxes[-1].append(box)
             else:

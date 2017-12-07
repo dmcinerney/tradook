@@ -30,7 +30,9 @@ def main(image_filename):
 
 	# delete examples that are not letters
 	print("step "+str(i)+": delete non-letter boxes and group by line (and sort)")
-	boxes = ed.remove_non_letters(boxes, results)
+	print(len(boxes), len(results))
+	boxes, results = ed.remove_non_letters(boxes, results)
+	print(len(boxes), len(results))
 	lines = ed.sort_boxes(boxes, group_by_line=True)
 	i += 1
 
@@ -44,6 +46,7 @@ def main(image_filename):
 
 	# attach letters to words and do any possible letter label correction using spellcheck library
 	print("step "+str(i)+": attatch letters to words")
+
 	i += 1
 
 	print("done")
