@@ -10,7 +10,7 @@ def get_interesting_areas(image):
     img = cv2.imread(image)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_gray = cv2.GaussianBlur(img_gray, (5,5), 0)
-    vis = img_gray.copy()
+    # vis = img_gray.copy()
 
 
 
@@ -80,11 +80,12 @@ def find_lines(boxes):
     return lines
 
     #cluster per line
-def split_words(lines, vis):
+def split_words(lines, img):
     i = 1
     for line in lines:
-        print i
+        # print i
         i+=1
+        centers = [[box.centerX, box.centerY] for box in line]
         num_boxes = len(line)
         errors = list()
         for i in np.arange(1, num_boxes):
@@ -103,20 +104,25 @@ def split_words(lines, vis):
         kmeans = KMeans(n_clusters=num_clusters, random_state=0).fit(centers)
         print kmeans.labels_
 
+        letters_in_word = list()
         words = list()
         label = kmeans.labels_[0]
         first_point = (line[0].minX, line[0].highY)
         for i in np.arange(0, len(line)):
             if i == len(line) - 1:
                 second_point = (line[i].maxX, line[i].lowY)
-                cv2.rectangle(vis, first_point, second_point, (0, 0, 255), 2)
+                letters_in_word.append(line[i])
+                words.append(Word(letters_in_word))
+                cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 break
             if kmeans.labels_[i] != kmeans.labels_[i+1]:
                 second_point = (line[i].maxX, line[i].lowY)
-                cv2.rectangle(vis, first_point, second_point, (0, 0, 255), 2)
+                letters_in_word.append(line[i])
+                words.append(Word(letters_in_word))
+                cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 first_point = (line[i + 1].minX, line[i + 1].highY)
-
-    plt.imshow(vis)
+    return words
+    plt.imshow(img)
     plt.show()
 
 
