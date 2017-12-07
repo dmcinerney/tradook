@@ -41,7 +41,7 @@ def cleanup_boxes(boxes):
     print len(boxes)
     boxes_size = len(boxes)
     while i < boxes_size:
-        if get_center_distance(boxes[i], boxes[i - 1]) <= 5: #should tailor this value based on the sizes of boxes in the image
+        if get_center_distance(boxes[i], boxes[i - 1]) <= 5 && np.sqrt(np.power(boxes[i].getArea(), 2) + np.power(boxes[i-1].getArea(), 2)) <= 20: #should tailor this value based on the sizes of boxes in the image
             boxes.pop(i - 1)
             boxes_size -= 1
         else:
@@ -100,10 +100,8 @@ def split_words(lines, img):
         else:
             derivatives = np.ediff1d(errors)
             num_clusters = np.argmin(derivatives) + 2
-        print num_clusters
 
         kmeans = KMeans(n_clusters=num_clusters, random_state=0).fit(centers)
-        print kmeans.labels_
 
         letters_in_word = list()
         words = list()

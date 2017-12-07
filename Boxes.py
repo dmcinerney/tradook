@@ -11,6 +11,9 @@ class Box():
     def getCenter(self):
         return (self.minX + self.maxX) / float(2),  (self.lowY + self.highY) / float(2)
 
+    def getArea(self):
+        return (self.maxX - self.minX) * (self.lowY - self.highY)
+
     def __str__(self):
         return '(' + str(self.centerX) + ', ' + str(self.centerY) + ')' + '(' + str(self.minX) + ', ' + str(self.highY) + ')' + '(' + str(self.maxX) + ', ' + str(self.lowY) + ')\n'
 
