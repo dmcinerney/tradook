@@ -16,7 +16,7 @@ def main(image_filename):
 	# clean up boxes using centroid and area
 	# output: an array of boxes ordered
 	print("step "+str(i)+": clean up boxes")
-	boxes = ed.cleanup_boxes(boxes)
+	boxes = ed.cleanup_boxes(boxes, image_filename)
 	i += 1
 
 
@@ -24,7 +24,7 @@ def main(image_filename):
 	# pao-net computes results and outputs predictions for each box in order
 	# output: array of labels
 	print("step "+str(i)+": predict letters for each box using pao-net")
-	results = letter_recognition_network(boxes, image_filename)
+	# results = letter_recognition_network(boxes, image_filename)
 	i += 1
 
 

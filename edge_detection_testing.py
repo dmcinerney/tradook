@@ -16,10 +16,10 @@ def get_interesting_areas(image):
 
 
     # regions = mser.detectRegions(vis, None)
-    regions, _ = mser.detectRegions(img_gray)
+    regions = mser.detectRegions(img_gray, None)
     boxes = list()
     # i = 1
-    for region in regions:
+    for i,region in enumerate(regions):
 
         region = np.array(region)
         minX = np.min(region[:, 0])
@@ -29,24 +29,31 @@ def get_interesting_areas(image):
         box = Box((minX, highestY), (maxX, lowestY))
         boxes.append(box)
         # cv2.circle(vis, (int(box.centerX), int(box.centerY)), 2, (0, 0, 255), -1)
-        # cv2.rectangle(vis, (maxX, lowestY), (minX, highestY), (255, 0, 0), 2)
+        cv2.rectangle(img, (maxX, lowestY), (minX, highestY), (150, (i + 10) % 255, 0), 1)
+    plt.imshow(img)
+    plt.show()
     return boxes
 
 
 
-def cleanup_boxes(boxes):
+def cleanup_boxes(boxes, img):
+    img = cv2.imread(img)
     boxes = sort_boxes(boxes)
     #remove duplicate boxes
     i = 1
     print len(boxes)
     boxes_size = len(boxes)
     while i < boxes_size:
-        if get_center_distance(boxes[i], boxes[i - 1]) <= 5 && np.sqrt(np.power(boxes[i].getArea(), 2) + np.power(boxes[i-1].getArea(), 2)) <= 20: #should tailor this value based on the sizes of boxes in the image
+        if get_center_distance(boxes[i], boxes[i - 1]) <= 5 and np.sqrt(np.power(boxes[i].getArea(), 2) + np.power(boxes[i-1].getArea(), 2)) <= 500: #should tailor this value based on the sizes of boxes in the image
             boxes.pop(i - 1)
             boxes_size -= 1
         else:
             i += 1
-
+    print len(boxes)
+    for box in boxes:
+        cv2.rectangle(img, (box.maxX, box.lowY), (box.minX, box.highY), (255, 0, 0), 1)
+    plt.imshow(img)
+    plt.show()
     return boxes
     # print boxes
 
