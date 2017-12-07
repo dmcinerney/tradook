@@ -34,7 +34,7 @@ class loading_to_label(Dataset): # load the images without applying any random t
         self.the_image = the_image
    
     def __len__(self):
-        return len(boxes)
+        return len(self.boxes)
 
     def __getitem__(self, idx):
         x1 = self.boxes[idx].minX
@@ -114,7 +114,8 @@ def print_result(output): # function to calculate accuracy by comparing the labe
             prediction = characters[letter]
             results.append(prediction)
         else:
-            results.append('-')        
+            results.append('-')
+    return results    
 
 def letter_recognition_network(boxes, image_name):
     criterion = nn.CrossEntropyLoss()
@@ -131,8 +132,8 @@ def letter_recognition_network(boxes, image_name):
     filename = 'weights_40_epochs.dms'
 
 
-    # cnn_model.load_state_dict(torch.load(filename), map_location=lambda storage, loc: storage)
-    cnn_model.load_state_dict(torch.load(filename))
+    params = torch.load(filename, map_location=lambda storage, loc: storage)
+    cnn_model.load_state_dict(params)
 
     transform = transforms.Compose([transforms.Scale((128,128)), transforms.ToTensor()])
 
@@ -153,7 +154,7 @@ def letter_recognition_network(boxes, image_name):
         output = cnn_model(image1) # get the output of the network
         classification = print_result(output)
 
-    return classification 
+    return classification
 
         
 
