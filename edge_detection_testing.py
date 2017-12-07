@@ -41,7 +41,7 @@ def cleanup_boxes(boxes):
     print len(boxes)
     boxes_size = len(boxes)
     while i < boxes_size:
-        if get_center_distance(boxes[i], boxes[i - 1]) <= 5 && np.sqrt(np.power(boxes[i].getArea(), 2) + np.power(boxes[i-1].getArea(), 2)) <= 20: #should tailor this value based on the sizes of boxes in the image
+        if get_center_distance(boxes[i], boxes[i - 1]) <= 5 and np.abs(boxes[i].getArea() - boxes[i-1].getArea()) <= 100: #should tailor this value based on the sizes of boxes in the image
             boxes.pop(i - 1)
             boxes_size -= 1
         else:
@@ -83,6 +83,7 @@ def find_lines(boxes):
     #cluster per line
 def split_words(lines, img):
     img = cv2.imread(img)
+    words = list()
     for line in lines:
         # centers = [[box.centerX, box.centerY] for box in line]
         centers = [[box.centerX] for box in line]
@@ -99,18 +100,19 @@ def split_words(lines, img):
         else:
             derivatives = np.ediff1d(errors)
             num_clusters = np.argmin(derivatives) + 1
-        print num_clusters
+        # print num_clusters
 
         kmeans = KMeans(n_clusters=num_clusters, random_state=0).fit(centers)
 
         letters_in_word = list()
-        words = list()
         label = kmeans.labels_[0]
         first_point = (line[0].minX, line[0].highY)
+        # words.append(Word([line[0]]))
         for i in np.arange(0, len(line)):
             if i == len(line) - 1:
                 second_point = (line[i].maxX, line[i].lowY)
                 letters_in_word.append(line[i])
+                print letters_in_word
                 words.append(Word(letters_in_word))
                 cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 break
@@ -120,6 +122,9 @@ def split_words(lines, img):
                 words.append(Word(letters_in_word))
                 cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 first_point = (line[i + 1].minX, line[i + 1].highY)
+
+            # if kmeans.labels_[i-1] != kmeans.labels_[i]:
+            #     words.append(Word([line[i]]))
     plt.imshow(img)
     plt.show()
     return words
