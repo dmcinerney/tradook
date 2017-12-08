@@ -47,11 +47,20 @@ def main(image_filename):
 	# attach letters to words and do any possible letter label correction using spellcheck library
 	print("step "+str(i)+": attatch letters to words")
 
+	current_result = 0
+	for word in words:
+		print(results[current_result:len(word)], current_result, len(word))
+		word.set_letters(results[current_result:len(word)])
+		current_result = len(word)
+
+
+	for word in words:
+		print(str(word))
 	i += 1
 
 	print("done")
 
 
 if __name__ == '__main__':
-	image_filename = "image1.png"
+	image_filename = "image"+sys.argv[1]+".png"
 	main(image_filename)
