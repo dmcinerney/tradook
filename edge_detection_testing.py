@@ -87,7 +87,38 @@ def find_lines(boxes):
     # plt.show()
     return lines
 
-    #cluster per line
+def new_find_lines(boxes):
+    boxes = sorted(boxes, cmp=compare_xs)
+    lines = list()
+    while (len(boxes) != 0):
+        line = list()
+        i = 0
+        slope = 0
+        intercept = boxes[0].centerY
+        first_x = boxes[0].centerX
+        first_y = boxes[0].centerY
+        # print boxes[0].getHeight()
+        thres_divider = 3
+        threshold = float(boxes[0].getHeight()) / float(thres_divider) #might have to change this value (3)
+        # print '$$$$',threshold
+        num_boxes_in_line = 0
+        while i < len(boxes):
+            # print len(boxes)
+            next_x, next_y = get_lines_point_at_x(boxes[i].centerX, slope, intercept)
+            # print next_x, next_y
+            if point_is_in_box(next_x, next_y, boxes[i]) and point_is_within_threshold(next_y, boxes[i].centerY, threshold):
+                line.append(boxes[i])
+                slope, intercept, threshold = recalculate_values(slope, threshold, boxes[i], first_x, first_y, thres_divider)
+                # print '****', slope, intercept, threshold
+                boxes.pop(i)
+            else:
+                # lines.append(line)
+                i+=1
+        lines.append(line)
+    # lines.append(line)
+    return lines
+
+#cluster per line
 def split_words(lines, img):
     img = cv2.imread(img)
     words = list()
@@ -178,3 +209,12 @@ def sort_boxes(boxes, group_by_line=False):
             else:
                 new_boxes.append(box)
     return new_boxes
+
+
+boxes = [Box((0, 4), (2, 6)), Box((3, 3.5), (5, 6))]
+boxes = [Box((2, 0), (4, 2)), Box((5, 0), (7, 2)), Box((8, 0), (10, 2)), Box((0, 4), (2, 6)), Box((3, 3.5), (5, 6))]
+print boxes
+boxes = sorted(boxes, cmp=compare_xs)
+print boxes
+lines = new_find_lines(boxes)
+print lines
