@@ -2,6 +2,7 @@ import numpy as np
 
 class Box():
     def __init__(self,a, b):
+        self.letter = None
         self.minX = a[0]
         self.highY = a[1]
         self.maxX = b[0]
@@ -17,8 +18,12 @@ class Box():
     def getHeight(self):
         return self.lowY - self.highY
 
+    def setLetter(self, l):
+        self.letter = l
+
     def __str__(self):
-        return '(' + str(self.centerX) + ', ' + str(self.centerY) + ')' + '(' + str(self.minX) + ', ' + str(self.highY) + ')' + '(' + str(self.maxX) + ', ' + str(self.lowY) + ')\n'
+        return "box: "+str(self.letter)
+        # return '(' + str(self.centerX) + ', ' + str(self.centerY) + ')' + '(' + str(self.minX) + ', ' + str(self.highY) + ')' + '(' + str(self.maxX) + ', ' + str(self.lowY) + ')\n'
 
     def __repr__(self):
         return self.__str__()

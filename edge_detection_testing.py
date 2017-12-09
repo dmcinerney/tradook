@@ -16,7 +16,7 @@ def get_interesting_areas(image):
 
 
     # regions = mser.detectRegions(vis, None)
-    regions = mser.detectRegions(img_gray, None)
+    regions, _ = mser.detectRegions(img_gray)
     boxes = list()
     # i = 1
     for i,region in enumerate(regions):
@@ -38,7 +38,7 @@ def get_interesting_areas(image):
 
 def cleanup_boxes(boxes, img):
     img = cv2.imread(img)
-    boxes = sort_boxes(boxes)
+    boxes = sorted(boxes, cmp=compare_xs)
     #remove duplicate boxes
     i = 1
     print len(boxes)
@@ -93,7 +93,7 @@ def draw_lines_for_testing(lines, img):
             cv2.line(img, (line[i].centerX, line[i].centerY), (line[i + 1].centerX, line[i + 1].centerY), 2)
 
 def new_find_lines(boxes):
-    boxes = sorted(boxes, cmp=compare_xs)
+    # boxes = sorted(boxes, cmp=compare_xs)
     lines = list()
     while (len(boxes) != 0):
         line = list()
@@ -127,7 +127,8 @@ def new_find_lines(boxes):
 def split_words(lines, img):
     img = cv2.imread(img)
     words = list()
-    for line in lines:
+    for j,line in enumerate(lines):
+        # print("line",j)
         # centers = [[box.centerX, box.centerY] for box in line]
         centers = [[box.centerX] for box in line]
         num_boxes = len(line)
@@ -152,22 +153,28 @@ def split_words(lines, img):
         first_point = (line[0].minX, line[0].highY)
         # words.append(Word([line[0]]))
         for i in np.arange(0, len(line)):
+            # print("letter",i)
+            letters_in_word.append(line[i])
             if i == len(line) - 1:
                 second_point = (line[i].maxX, line[i].lowY)
-                letters_in_word.append(line[i])
-                print letters_in_word
+                # print letters_in_word
                 words.append(Word(letters_in_word))
                 cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 break
             if kmeans.labels_[i] != kmeans.labels_[i+1]:
                 second_point = (line[i].maxX, line[i].lowY)
-                letters_in_word.append(line[i])
+                # print letters_in_word
                 words.append(Word(letters_in_word))
                 cv2.rectangle(img, first_point, second_point, (0, 0, 255), 2)
                 first_point = (line[i + 1].minX, line[i + 1].highY)
+                letters_in_word = list()
 
             # if kmeans.labels_[i-1] != kmeans.labels_[i]:
             #     words.append(Word([line[i]]))
+    for word in words:
+        first_point = (word.minx, word.miny)
+        second_point = (word.maxx, word.maxy)
+        cv2.rectangle(img, first_point, second_point, (0, 255, 0), 2)
     plt.imshow(img)
     plt.show()
     return words

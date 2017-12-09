@@ -33,7 +33,7 @@ def main(image_filename):
 	boxes, results = ed.remove_non_letters(boxes, results)
 	for j,box in enumerate(boxes):
 		box.setLetter(results[j])
-	lines = ed.sort_boxes(boxes, group_by_line=True)
+	lines = ed.new_find_lines(boxes)
 	i += 1
 
 
