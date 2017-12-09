@@ -34,7 +34,8 @@ class Word:
             return_str += str(box.letter)
         return return_str
 
-from Boxes import Box
+
 if __name__ == '__main__':
+    from Boxes import Box
     w = Word([Box((1,1),(1,1)), Box((2,2),(2,2)), Box((3,1),(1,1)), Box((4,1),(1,1)), Box((5,1),(1,1))])
     print(w.minx, w.miny, w.maxx, w.maxy, w.boxes)
