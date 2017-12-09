@@ -15,7 +15,7 @@ def get_interesting_areas(image):
 
 
 
-    # regions = mser.detectRegions(vis, None)
+    # regions = mser.detectRegions(img_gray, None)
     regions, _ = mser.detectRegions(img_gray)
     boxes = list()
     # i = 1
@@ -221,12 +221,3 @@ def sort_boxes(boxes, group_by_line=False):
             else:
                 new_boxes.append(box)
     return new_boxes
-
-
-boxes = [Box((0, 4), (2, 6)), Box((3, 3.5), (5, 6))]
-boxes = [Box((2, 0), (4, 2)), Box((5, 0), (7, 2)), Box((8, 0), (10, 2)), Box((0, 4), (2, 6)), Box((3, 3.5), (5, 6))]
-print boxes
-boxes = sorted(boxes, cmp=compare_xs)
-print boxes
-lines = new_find_lines(boxes)
-print lines

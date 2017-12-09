@@ -1,5 +1,7 @@
 import edge_detection_testing as ed
 from letter_recognition_network import *
+import interactive_image
+import autocorrecter
 
 def main(image_filename):
 	# take in an image filename
@@ -43,6 +45,12 @@ def main(image_filename):
 	print("step "+str(i)+": group boxes together into words")
 	words = ed.split_words(lines, image_filename)
 	i += 1
+
+	# autocorrect all the words in words
+	words = auto_correct_of_all_words(words)
+
+	#display interactive image
+	display_interactive_image(image_filename, words)
 
 	print([str(word) for word in words])
 	print("done")
