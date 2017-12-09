@@ -87,6 +87,11 @@ def find_lines(boxes):
     # plt.show()
     return lines
 
+def draw_lines_for_testing(lines, img):
+    for line in lines:
+        for i in range(0, len(line) - 1):
+            cv2.line(img, (line[i].centerX, line[i].centerY), (line[i + 1].centerX, line[i + 1].centerY), 2)
+
 def new_find_lines(boxes):
     boxes = sorted(boxes, cmp=compare_xs)
     lines = list()
