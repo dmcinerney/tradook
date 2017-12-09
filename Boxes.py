@@ -74,6 +74,10 @@ def compare_xs(a,b):
         return -1
     return 1
 
+def compare_areas(a, b): #returns -1 if a is smaller and 1 if b is smaller
+    if a.getArea() <= b.getArea:
+        return -1
+    return 1
 def point_is_in_box(x, y, box):
     if x >= box.minX and x <= box.maxX and y >= box.highY and y <= box.lowY:
         return True

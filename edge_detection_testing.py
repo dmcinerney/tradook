@@ -40,13 +40,16 @@ def cleanup_boxes(boxes, img):
     img = cv2.imread(img)
     boxes = sort_boxes(boxes)
 
+    # boxes = sorted(boxes, cmp=compare_xs)
+
     #remove duplicate boxes
     i = 1
     print len(boxes)
     boxes_size = len(boxes)
     while i < boxes_size:
-        if get_center_distance(boxes[i], boxes[i - 1]) <= 5:# or np.abs(boxes[i].getArea() - boxes[i-1].getArea()) > img.shape[0]/3*img.shape[1]/3: #should tailor this value based on the sizes of boxes in the image
-            boxes.pop(i - 1)
+        if get_center_distance(boxes[i], boxes[i - 1]) <= 5: # and np.abs(boxes[i].getArea() - boxes[i-1].getArea()) <= 100: #should tailor this value based on the sizes of boxes in the image
+            # boxes.pop(i + compare_areas(boxes[i - 1], boxes[i]))
+            boxes.pop(i-1)
             boxes_size -= 1
         else:
             i += 1
