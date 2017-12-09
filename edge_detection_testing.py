@@ -48,8 +48,8 @@ def cleanup_boxes(boxes, img):
     boxes_size = len(boxes)
     while i < boxes_size:
         if get_center_distance(boxes[i], boxes[i - 1]) <= 5: # and np.abs(boxes[i].getArea() - boxes[i-1].getArea()) <= 100: #should tailor this value based on the sizes of boxes in the image
-            # boxes.pop(i + compare_areas(boxes[i - 1], boxes[i]))
-            boxes.pop(i-1)
+            boxes.pop(i + compare_areas(boxes[i - 1], boxes[i]))
+            # boxes.pop(i-1)
             boxes_size -= 1
         else:
             i += 1
