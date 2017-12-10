@@ -9,7 +9,8 @@ def box_diff(box1, box2):
     # return box1.getCenter()[0]-box2.getCenter()[0]
 
 def get_words(lines):
-    cuttoff = 3
+    next_word_cuttoff = 2
+    same_word_cuttoff = 3
     words = []
     for line in lines:
         boxes = sorted(line, key=lambda x:x.getCenter()[0])
@@ -17,31 +18,32 @@ def get_words(lines):
             words.append(Word([boxes[0]]))
             continue
         avg_width = np.mean([box.getWidth() for box in boxes])
-        print(avg_width)
+        # print(avg_width)
         diff = [boxes[i+1].getCenter()[0]-boxes[i].getCenter()[0] for i in range(len(boxes)-1)]
         diff = [box_diff(boxes[i+1],boxes[i]) for i in range(len(boxes)-1)]
-        diff_groups = list(grouper(diff, avg_width/4, lambda x:x))
+        diff_groups = list(grouper(diff, avg_width/6, lambda x:x))
         print(diff_groups)
         diff_group = min(diff_groups, key=lambda x:np.abs(np.mean(x)))
 
         # plt.hist(diff, 20)
         # plt.show()
-        mean = min(avg_width/2, np.mean(diff_group))
+        # mean = min(avg_width/2, np.mean(diff_group))
+        mean = np.mean(diff_group)
         if len(diff_group) > 2:
             std = np.std(diff_group)
         else:
-            std = avg_width/6
-        # std = avg_width/2
-        print(mean, std)
+            std = avg_width/8
 
-        print(len(boxes))
+        std = std + mean/4
+        # std = avg_width/2
+        print(mean, std, avg_width)
         for i,box in enumerate(boxes):
             if i > 0:
                 print(box.letter, box_diff(box,words[-1].boxes[-1]))
-            if i == 0 or box_diff(box,words[-1].boxes[-1]) > mean+cuttoff*std:
+            if i == 0 or box_diff(box,words[-1].boxes[-1]) > mean+next_word_cuttoff*std:
                 words.append(Word([box]))
                 # print("starting new word")
-            elif box_diff(box,words[-1].boxes[-1]) > mean-cuttoff*std:
+            elif box_diff(box,words[-1].boxes[-1]) > mean-same_word_cuttoff*std:
                 words[-1].append(box)
                 # print("appending box to word")
 
@@ -56,7 +58,7 @@ def draw_letters(boxes, img):
 
 def draw_words(words, img):
     for word in words:
-        draw_letters(word.boxes, img)
+        # draw_letters(word.boxes, img)
         first_point = (word.minx, word.miny)
         second_point = (word.maxx, word.maxy)
         cv2.rectangle(img, first_point, second_point, (255, 0, 0), 2)

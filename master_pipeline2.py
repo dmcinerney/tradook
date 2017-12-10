@@ -16,9 +16,9 @@ def main(image_filename):
 
 
     # input: array of boxes ordered
-    # clean up boxes using centroid and area
+    # prune using centroid
     # output: an array of boxes ordered
-    print("step "+str(i)+": clean up boxes")
+    print("step "+str(i)+": prune repeated boxes based on centroid")
     boxes = ed.cleanup_boxes(boxes, image_filename)
     i += 1
 
@@ -32,15 +32,22 @@ def main(image_filename):
 
 
     # delete examples that are not letters
-    print("step "+str(i)+": delete non-letter boxes and group by line (and sort)")
+    print("step "+str(i)+": prune non-letter boxes")
     boxes, results = ed.remove_non_letters(boxes, results)
-
-
     for j,box in enumerate(boxes):
         box.setLetter(results[j])
+    i += 1
 
+    print("step "+str(i)+": prune inner boxes")
     ed.remove_inner_boxes(boxes)
+    # draw boxes
+    img = cv2.imread(image_filename)
+    draw_letters(boxes, img)
+    plt.imshow(img)
+    plt.show()
+    i += 1
 
+    print("step "+str(i)+": group boxes by line and sort")
     lines = ed.new_find_lines(list(boxes))
     lines = sorted(lines, key=lambda x:x[0].getCenter()[1])
     ed.draw_lines_for_testing(lines, image_filename)
@@ -52,14 +59,6 @@ def main(image_filename):
     print("step "+str(i)+": group boxes together into words")
     # words = ed.split_words(lines, image_filename)
     words = get_words(lines)
-
-    # autocorrect all the words in words
-    auto_correct_of_all_words(words)
-
-    print([str(word) for word in words])
-    print([word.content for word in words])
-
-
     img = cv2.imread(image_filename)
     draw_letters(boxes, img)
     draw_words(words, img)
@@ -67,11 +66,19 @@ def main(image_filename):
     plt.show()
     i += 1
 
+    # autocorrect all the words in words
+    print("step "+str(i)+": autocorrect words")
+    print([str(word) for word in words])
+    auto_correct_of_all_words(words)
+    print([str(word.content) for word in words])
+    i += 1
+
     #display interactive image
+    print("step "+str(i)+": display interactive image")
     display_interactive_image(image_filename, words)
     print("done")
 
 
 if __name__ == '__main__':
-    image_filename = "image"+sys.argv[1]+".png"
+    image_filename = "image4.png"
     main(image_filename)

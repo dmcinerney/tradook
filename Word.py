@@ -5,7 +5,7 @@ class Word:
         self.miny = None
         self.maxx = None
         self.maxy = None
-        self.content = None
+        self.content = []
         for box in boxes:
             self.boxes.append(box)
         self.update_box()
@@ -29,7 +29,7 @@ class Word:
         return len(self.boxes)
 
     def __str__(self):
-        return_str = "word: "
+        return_str = ""
         for box in self.boxes:
             return_str += str(box.letter)
         return return_str
