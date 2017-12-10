@@ -16,7 +16,6 @@ class Word:
 
 
     def update_box(self):
-
         self.minx = min([min(box.minX,box.maxX) for box in self.boxes])
         self.miny = min([min(box.highY,box.lowY) for box in self.boxes])
         self.maxx = max([max(box.minX,box.maxX) for box in self.boxes])

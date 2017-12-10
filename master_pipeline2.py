@@ -1,7 +1,7 @@
 import edge_detection_testing as ed
 from letter_recognition_network import *
 import interactive_image
-import autocorrecter
+from autocorrecter import auto_correct_of_all_words
 from get_words import get_words, draw_words, draw_letters
 
 def main(image_filename):
@@ -49,16 +49,13 @@ def main(image_filename):
     # words = ed.split_words(lines, image_filename)
     words = get_words(lines)
 
-<<<<<<< HEAD
-	# autocorrect all the words in words
-	words = auto_correct_of_all_words(words)
+    # autocorrect all the words in words
+    auto_correct_of_all_words(words)
 
-	#display interactive image
-	display_interactive_image(image_filename, words)
+    print([str(word) for word in words])
+    print([word.content for word in words])
 
-	print([str(word) for word in words])
-	print("done")
-=======
+
     img = cv2.imread(image_filename)
     draw_letters(boxes, img)
     draw_words(words, img)
@@ -66,13 +63,9 @@ def main(image_filename):
     plt.show()
     i += 1
 
-    print([str(word) for word in words])
-    # for word in words:
-    #     print(str(word))
-    #     for letter in word.boxes:
-    #         print(str(letter),letter.minX,letter.maxX,letter.lowY,letter.highY)
+    #display interactive image
+    display_interactive_image(image_filename, words)
     print("done")
->>>>>>> f2113e839f3feb492565f0b75a721667f84d0487
 
 
 if __name__ == '__main__':
