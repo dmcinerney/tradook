@@ -7,7 +7,7 @@ from sklearn.cluster import KMeans
 from Word import Word
 
 def get_interesting_areas(image):
-    mser = cv2.MSER_create()
+    mser = cv2.MSER_create(_delta=10)
     img = cv2.imread(image)
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_gray = cv2.GaussianBlur(img_gray, (5,5), 0)
@@ -35,6 +35,27 @@ def get_interesting_areas(image):
     return boxes
 
 
+def remove_inner_boxes(boxes):
+    print("removing inner boxes")
+    boxes_size = len(boxes)
+    indices_to_delete = []
+    i = 0
+    while i < boxes_size:
+        j = 0
+        while j < boxes_size:
+            # print(i,j,boxes[i].inside(boxes[j]))
+            if i != j:
+                if boxes[i].inside(boxes[j]):
+                    indices_to_delete.append(i)
+                    break
+            j += 1
+        i += 1
+    print("indices to delete",indices_to_delete)
+    print("len of boxes",len(boxes))
+    for z in sorted(indices_to_delete, key=lambda x:-x):
+        boxes.pop(z)
+    print("len of boxes",len(boxes))
+    return boxes
 
 def cleanup_boxes(boxes, img):
     img = cv2.imread(img)
@@ -55,7 +76,7 @@ def cleanup_boxes(boxes, img):
             i += 1
     print len(boxes)
     for box in boxes:
-        cv2.rectangle(img, (box.maxX, box.lowY), (box.minX, box.highY), (0, 255, 0), 2)
+        cv2.rectangle(img, (box.maxX, box.lowY), (box.minX, box.highY), (0, 255, 0), 1)
     plt.imshow(img)
     plt.show()
 

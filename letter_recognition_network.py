@@ -37,12 +37,23 @@ class loading_to_label(Dataset): # load the images without applying any random t
         return len(self.boxes)
 
     def __getitem__(self, idx):
-        x1 = self.boxes[idx].minX
-        x2 = self.boxes[idx].maxX
-        y2 = self.boxes[idx].lowY
-        y1 = self.boxes[idx].highY
+
+        factor = 0.25
+        x1 = float(self.boxes[idx].minX)
+        x2 = float(self.boxes[idx].maxX)
+        y2 = float(self.boxes[idx].lowY)
+        y1 = float(self.boxes[idx].highY)
+        # print(x1, y1, y2, x2)
+        x1 = x1 - self.boxes[idx].getWidth() * factor
+        x2 = x2 + self.boxes[idx].getWidth() * factor
+        y2 = y2 + self.boxes[idx].getHeight() * factor
+        y1 = y1 - self.boxes[idx].getHeight() * factor
+        # print(x1, y1, y2, x2)
 
         image1 = self.the_image.crop((x1, y1, x2, y2))
+        # plt.imshow(image1)
+        # plt.show()
+        # raise Exception
         
         if self.transform is not None:
             image1 = self.transform(image1)
@@ -110,12 +121,12 @@ def print_result(output): # function to calculate accuracy by comparing the labe
         counter += 1.0
         output_numpy = output.data.cpu().numpy()[i] # this is an array
         letter = np.argmax(output_numpy)
-        if (output_numpy[letter] > 0.91):
+        if (output_numpy[letter] > 0.5):
             prediction = characters[letter]
             results.append(prediction)
         else:
             results.append('-')
-    return results    
+    return results
 
 def letter_recognition_network(boxes, image_name):
     criterion = nn.CrossEntropyLoss()

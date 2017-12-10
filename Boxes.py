@@ -24,6 +24,14 @@ class Box():
     def setLetter(self, l):
         self.letter = l
 
+    def inside(self, box):
+        return (
+            self.minX > box.minX and
+            self.highY > box.highY and
+            self.maxX < box.maxX and
+            self.lowY < box.lowY
+        )
+
     def __str__(self):
         return "box: "+str(self.letter)
         # return '(' + str(self.centerX) + ', ' + str(self.centerY) + ')' + '(' + str(self.minX) + ', ' + str(self.highY) + ')' + '(' + str(self.maxX) + ', ' + str(self.lowY) + ')\n'
@@ -78,7 +86,7 @@ def compare_xs(a,b):
     return 1
 
 def compare_areas(a, b): #returns -1 if a is smaller and 1 if b is smaller
-    if a.getArea() <= b.getArea:
+    if a.getArea() <= b.getArea():
         return -1
     return 0
 

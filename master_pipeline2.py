@@ -1,6 +1,6 @@
 import edge_detection_testing as ed
 from letter_recognition_network import *
-import interactive_image
+from interactive_image import display_interactive_image
 from autocorrecter import auto_correct_of_all_words
 from get_words import get_words, draw_words, draw_letters
 
@@ -34,13 +34,17 @@ def main(image_filename):
     # delete examples that are not letters
     print("step "+str(i)+": delete non-letter boxes and group by line (and sort)")
     boxes, results = ed.remove_non_letters(boxes, results)
+
+
     for j,box in enumerate(boxes):
         box.setLetter(results[j])
+
+    ed.remove_inner_boxes(boxes)
+
     lines = ed.new_find_lines(list(boxes))
     lines = sorted(lines, key=lambda x:x[0].getCenter()[1])
     ed.draw_lines_for_testing(lines, image_filename)
     i += 1
-
 
     # input: array of boxes ordered
     # call function to form words from boxes
